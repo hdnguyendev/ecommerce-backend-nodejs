@@ -1,10 +1,12 @@
 ### Sign up
 @url_dev = http://localhost:9003/v1/api
+@api_key = 123456
 POST {{url_dev}}/shop/signup
 Content-Type: application/json
+x-api-key: 512550ead04a06021a23b1b956d5cf9de8bcb015f7f20090336f23692bda21e18a41927e33be6092d101056547722978a911bd20b14cbf4fd3c3e6e3af63d39e
 
 {
     "name": "Shop hdnguyendev",
-    "email": "hdnguyendev32@gmail.com",
+    "email": "hdnguyenddsadasevd@gmail.com",
     "password": "abc123"
 }
