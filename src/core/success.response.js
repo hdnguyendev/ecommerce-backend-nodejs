@@ -10,6 +10,8 @@ const ReasonStatusCode = {
   CREATED: "Created Successfully",
 };
 
+const { ReasonPhrases, StatusCodes } = require("../utils/httpStatusCode");
+
 class SuccessResponse {
   constructor({
     message,
@@ -45,8 +47,8 @@ class CREATED extends SuccessResponse {
   }
 }
 
-
 module.exports = {
-    OK,
-    CREATED,
-}
+  OK,
+  CREATED,
+  SuccessResponse
+};

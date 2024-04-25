@@ -19,10 +19,13 @@ var keyTokenSchema = Schema(
       type: String,
       required: true,
     },
-    refeshToken: {
+    refeshTokensUsed: {
       type: Array,
+      default: [], // Những token đã sử dụng
+    },
+    refreshToken: {
+      type: String,
       required: true,
-      default: [],
     },
   },
   {

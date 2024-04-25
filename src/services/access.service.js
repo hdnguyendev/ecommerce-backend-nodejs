@@ -6,7 +6,12 @@ const crypto = require("node:crypto");
 const KeyTokenService = require("./keyToken.service");
 const { createTokenPair } = require("../auth/authUtils");
 const { getInfoData } = require("../utils");
-const { ConflictRequestError, BadRequestError } = require("../core/error.response");
+const {
+  ConflictRequestError,
+  BadRequestError,
+  AuthFailureError,
+} = require("../core/error.response");
+const { findByEmail } = require("./shop.service");
 const RoleShop = {
   SHOP: "SHOP",
   WRITER: "WRITER",
@@ -15,6 +20,50 @@ const RoleShop = {
 };
 
 class AccessService {
+  /* 
+    1 - check email exist?
+    2 - check password correct?
+    3 - create AccessToken, RefreshToken and save to KeyStore
+    4 - generate token 
+    5 - get data and return login success
+  */
+  static login = async ({ email, password, refreshToken = null }) => {
+    const foundShop = await findByEmail({ email });
+    // 1
+    if (!foundShop) {
+      throw new BadRequestError("Shop not registered");
+    }
+    // 2
+    const match = bycrypt.compare(password, foundShop.password);
+    if (!match) {
+      throw new AuthFailureError("Authentication failed!");
+    }
+    // 3
+    const privateKey = crypto.randomBytes(64).toString("hex");
+    const publicKey = crypto.randomBytes(64).toString("hex");
+    // 4
+    const { _id: userId } = foundShop;
+    const tokens = await createTokenPair(
+      { userId: foundShop._id, email },
+      publicKey,
+      privateKey
+    );
+
+    await KeyTokenService.createKeyToken({
+      refreshToken: tokens.refreshToken,
+      privateKey,
+      publicKey,
+      userId,
+    });
+    return {
+      shop: getInfoData({
+        filed: ["_id", "name", "email"],
+        object: foundShop,
+      }),
+      tokens,
+    };
+  };
+
   static signUp = async ({ name, email, password }) => {
     // check email exist?
     const holderShop = await shopModel.findOne({ email }).lean();
@@ -32,7 +81,6 @@ class AccessService {
     });
 
     if (newShop) {
-     
       const privateKey = crypto.randomBytes(64).toString("hex");
       const publicKey = crypto.randomBytes(64).toString("hex");
 
