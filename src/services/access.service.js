@@ -20,6 +20,10 @@ const RoleShop = {
 };
 
 class AccessService {
+  static logout = async({ keyStore }) => {
+    return await KeyTokenService.removeKeyById({id : keyStore._id});
+  }
+
   /* 
     1 - check email exist?
     2 - check password correct?
@@ -124,6 +128,8 @@ class AccessService {
       metadata: null,
     };
   };
+
+  
 }
 
 module.exports = AccessService;
