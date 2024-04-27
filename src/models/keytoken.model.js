@@ -19,7 +19,7 @@ var keyTokenSchema = Schema(
       type: String,
       required: true,
     },
-    refeshTokensUsed: {
+    refreshTokensUsed: {
       type: Array,
       default: [], // Những token đã sử dụng
     },
