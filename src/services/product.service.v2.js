@@ -7,6 +7,13 @@ const {
   FurnitureModel,
 } = require("../models/product.model");
 const { BadRequestError } = require("../core/error.response");
+const {
+  findAllDrafsForShop,
+  findAllPublishForShop,
+  publishProductByShop,
+  unPublishProductByShop,
+  searchProductsByUser,
+} = require("../models/repositories/product.repo");
 
 // Define Factory class to create product
 class ProductFactory {
@@ -29,6 +36,33 @@ class ProductFactory {
 
     return new productClass(payload).createProduct();
   }
+
+  // PUT //
+  static async publishProductByShop({ product_shop, product_id }) {
+    return await publishProductByShop({ product_shop, product_id });
+  }
+
+  static async unPublishProductByShop({ product_shop, product_id }) {
+    return await unPublishProductByShop({ product_shop, product_id });
+  }
+  // END PUT //
+
+  // QUERY //
+  static async findAllDrafsForShop({ product_shop, limit = 50, skip = 0 }) {
+    const query = { product_shop, isDraft: true };
+
+    return await findAllDrafsForShop({ query, limit, skip });
+  }
+  static async findAllPublishForShop({ product_shop, limit = 50, skip = 0 }) {
+    const query = { product_shop, isPublished: true };
+
+    return await findAllPublishForShop({ query, limit, skip });
+  }
+
+  static async searchProducts(keySearch) {
+    return await searchProductsByUser(keySearch);
+  }
+  // END QUERY //
 }
 
 // define basic product class
@@ -129,9 +163,8 @@ class Furniture extends Product {
 }
 
 // register product types
-ProductFactory.registerProductType('Electronics', Electronics);
-ProductFactory.registerProductType('Clothing', Clothing);
-ProductFactory.registerProductType('Furniture', Furniture);
-
+ProductFactory.registerProductType("Electronics", Electronics);
+ProductFactory.registerProductType("Clothing", Clothing);
+ProductFactory.registerProductType("Furniture", Furniture);
 
 module.exports = ProductFactory;
