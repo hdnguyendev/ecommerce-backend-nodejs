@@ -38,13 +38,6 @@ class ProductController {
   };
 
   // QUERY //
-
-  /**
-   * @description Get All Drafts For Shop
-   * @param { Number } limit
-   * @param { Number } skip
-   * @return { JSON }
-   */
   getAllDraftsForShop = async (req, res, next) => {
     new SuccessResponse({
       message: "Get All Drafts For Shop Successfully",
@@ -53,13 +46,7 @@ class ProductController {
       }),
     }).send(res);
   };
-
-  /**
-   * @description Get All Publish For Shop
-   * @param { Number } limit
-   * @param { Number } skip
-   * @return { JSON }
-   */
+  
   getAllPublishForShop = async (req, res, next) => {
     new SuccessResponse({
       message: "Get All Publish For Shop Successfully",
@@ -69,17 +56,29 @@ class ProductController {
     }).send(res);
   };
 
-  /**
-   * @description Get List Search Products
-   * @param { String } keySearch
-   * @return { JSON }
-   */
   searchProductsByUser = async (req, res, next) => {
     new SuccessResponse({
       message: "Search Products By User Successfully",
       metadata: await ProductServiceV2.searchProducts(req.params),
     }).send(res);
   };
+
+  findAllProducts = async (req, res, next) => {
+    new SuccessResponse({
+      message: "Get All Products Successfully",
+      metadata: await ProductServiceV2.findAllProducts(req.query),
+    }).send(res);
+  }
+
+  findProduct = async (req, res, next) => {
+    new SuccessResponse({
+      message: "Get Product Successfully",
+      metadata: await ProductServiceV2.findProduct({
+        product_id: req.params.product_id
+      }),
+
+    }).send(res);
+  }
   // END QUERY //
 }
 
