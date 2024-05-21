@@ -14,8 +14,14 @@ const {
   unPublishProductByShop,
   searchProductsByUser,
   findAllProducts,
-  findProduct
+  findProduct,
+  updateProductById,
 } = require("../models/repositories/product.repo");
+const {
+  removeUndefinedObject,
+  updateNestedObjectParser,
+} = require("../utils/");
+const { model } = require("mongoose");
 
 // Define Factory class to create product
 class ProductFactory {
@@ -38,8 +44,15 @@ class ProductFactory {
 
     return new productClass(payload).createProduct();
   }
-  // TODO - implement update product
-  static async updateProduct() {}
+  static async updateProduct(type, product_id, payload) {
+    const productClass = ProductFactory.productRegistry[type];
+
+    if (!productClass) {
+      throw new BadRequestError(`Invalid product type ${type}`);
+    }
+
+    return new productClass(payload).updateProduct(product_id);
+  }
 
   // PUT //
   static async publishProductByShop({ product_shop, product_id }) {
@@ -80,8 +93,8 @@ class ProductFactory {
       select: ["product_name", "product_price", "product_thumb"],
     });
   }
-  static async findProduct({product_id}) {
-    return await findProduct({product_id, unSelect: ['__v']})
+  static async findProduct({ product_id }) {
+    return await findProduct({ product_id, unSelect: ["__v"] });
   }
   // END QUERY //
 }
@@ -112,6 +125,15 @@ class Product {
   async createProduct(product_id) {
     return await ProductModel.create({ ...this, _id: product_id });
   }
+
+  // update product
+  async updateProduct(product_id, payload) {
+    return await updateProductById({
+      product_id,
+      payload,
+      model: ProductModel,
+    });
+  }
 }
 
 // Define sub-class for different product types: Clothing
@@ -134,6 +156,22 @@ class Clothing extends Product {
     }
 
     return newProduct;
+  }
+
+  async updateProduct(product_id) {
+    const objectParams = removeUndefinedObject(this);
+
+    if (objectParams.product_attributes) {
+      await updateProductById({
+        product_id,
+        payload: updateNestedObjectParser(objectParams.product_attributes),
+        model: ClothingModel,
+      });
+    }
+
+    const updateProduct = await super.updateProduct(product_id, updateNestedObjectParser(objectParams));
+
+    return updateProduct;
   }
 }
 

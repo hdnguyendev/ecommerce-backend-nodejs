@@ -82,6 +82,10 @@ const findProduct = async ({ product_id, unSelect }) => {
   return await ProductModel.findById(product_id).select(unGetSelectData(unSelect));
 };
 
+const updateProductById = async ({ product_id, payload, model, isNew = true }) => {
+  return await model.findByIdAndUpdate(product_id, payload, { new: isNew });
+}
+
 const queryProduct = async ({ query, limit, skip }) => {
   return await ProductModel.find(query)
     .populate("product_shop", "name email -_id")
@@ -98,5 +102,6 @@ module.exports = {
   unPublishProductByShop,
   searchProductsByUser,
   findAllProducts,
-  findProduct
+  findProduct,
+  updateProductById
 };
