@@ -21,7 +21,9 @@ const {
   removeUndefinedObject,
   updateNestedObjectParser,
 } = require("../utils/");
+const slugify = require("slugify");
 const { model } = require("mongoose");
+const { insertInventory } = require("../models/repositories/inventory.repo");
 
 // Define Factory class to create product
 class ProductFactory {
@@ -123,7 +125,16 @@ class Product {
 
   // create new product
   async createProduct(product_id) {
-    return await ProductModel.create({ ...this, _id: product_id });
+    const newProduct =  await ProductModel.create({ ...this, _id: product_id });
+
+    await insertInventory({
+      productId: newProduct._id,
+      shopId: this.product_shop,
+      stock: this.product_quantity,
+    })
+
+
+    return newProduct;
   }
 
   // update product
@@ -167,6 +178,9 @@ class Clothing extends Product {
         payload: updateNestedObjectParser(objectParams.product_attributes),
         model: ClothingModel,
       });
+    }
+    if (objectParams.product_name) { 
+      objectParams.product_slug =  slugify(objectParams.product_name, { lower: true });
     }
 
     const updateProduct = await super.updateProduct(product_id, updateNestedObjectParser(objectParams));

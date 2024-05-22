@@ -45,6 +45,10 @@ const removeUndefinedObject = obj => {
 const updateNestedObjectParser = obj => {
     const final = {}
     Object.keys(obj).forEach(k => {
+
+        if (obj[k] === undefined || obj[k] === null) {
+            delete obj[k]
+        }
         if (typeof obj[k] === 'object' && !Array.isArray(obj[k])) {
             const nested = updateNestedObjectParser(obj[k])
             Object.keys(nested).forEach(nk => {
